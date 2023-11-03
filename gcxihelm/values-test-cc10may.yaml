@@ -1,0 +1,57 @@
+# Additional values for gcxi.
+# This is a YAML-formatted file.
+# Declare variables will be over written in your values.yaml file
+
+gcxi:
+  env:
+    GCXI_GIM_DB:
+      DSNDEF1: DSN_NAME=GCXI_GIM_DB;DB_TYPE=SQLSERVER;DB_TYPE_EX=Microsoft SQL Server 2012;HOST=hostorip.com;PORT=1433;DB_NAME=GIM;LOGIN=usernames;PASSWORD=gimpassw
+      DSNDEF2: DSN_NAME=GCXI_IWD_DB;DB_TYPE=SQLSERVER;DB_TYPE_EX=Microsoft SQL Server 2012;HOST=hostorip.com;PORT=1433;DB_NAME=GIM;LOGIN=usernames;PASSWORD=gimpassw
+      
+    # MSTR_PASSWORD: current MSTR Administrator password to use; in case of the new deployment that would be the new password to be set instead of the default one; in case of password change this would be the new (desired) password to be set
+    MSTR_PASSWORD: P@ssw0rd123
+    # MSTR_PASSWORD_OLD: in case of pwd change this would be the old MSTR Administrator password to be replaced; otherwise leave empty
+    MSTR_PASSWORD_OLD: Genesys_0
+
+  deployment:
+    deployPostgres: true
+    deployLocalPV: false
+    useDynamicLogPV: true
+
+  imagePullPolicy:
+    worker: IfNotPresent
+    control: IfNotPresent
+
+  images:
+    gcxi:
+      # gcxi image names, concatenated with repository and version
+      control: quay.io/images/gcxi_control
+      worker: quay.io/images/gcxi
+    postgres: quay.io/images/postgresql12
+
+  replicas:
+    worker: 2
+
+  pvc:
+    # meta db permanent and temporary backups
+    backup:
+      capacity: 20Gi
+      storageClassName: managed-nfs-storage
+      volumeName:
+    # storage for main gcxi workers logs (Microstrategy server logs)
+    log:
+      capacity: 20Gi
+      hostPath: /mnt/log/gcxi
+      storageClassName: managed-nfs-storage
+      volumeName: 
+    # storage for meta db Postgres data volume
+    postgres:
+      capacity: 100Gi
+      storageClassName: managed-nfs-storage
+      volumeName:
+    # storage for main gcxi workers cluster data (Microstrategy caches and cubes)
+    # requires ReadWriteMany
+    share:
+      capacity: 20Gi
+      storageClassName: managed-nfs-storage
+      volumeName: 
